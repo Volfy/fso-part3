@@ -1,8 +1,14 @@
-const {request, response} = require('express')
+//const {req, res} = require('express')
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
 app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :requested'))
+morgan.token('requested', (reqS, resS, param) => {
+    return ''
+})
+
 
 // Persons
 
@@ -31,53 +37,63 @@ let persons = [
 
 // RESTful/CRUD
 
-app.get('/', (request, response) => {
-    console.log(request.headers)
-    response.send('<h1>Phonebook</h1><br>' +
+app.get('/', (req, res) => {
+    res.send('<h1>Phonebook</h1><br>' +
                 '<em>/info</em> for general info<br>' +
                 '<em>/api/persons</em> for all persons<br>' +
                 '<em>/api/persons/(id)</em> for specific entry<br>')
 })
 
-app.get('/info', (request, response) => {
-    // console.log(request.headers)
-    response.send(`Phonebook has info on ${persons.length} people. <br>${new Date()}`)
+app.get('/info', (req, res) => {
+    // console.log(req.headers)
+    res.send(`Phonebook has info on ${persons.length} people. <br>${new Date()}`)
 })
 
 
-app.get('/api/persons', (request, response) => {
-    // console.log(request.headers)
-    response.json(persons)
+app.get('/api/persons', (req, res) => {
+    // console.log(req.headers)
+    res.json(persons)
 })
 
-app.get('/api/persons/:id', (request, response) => {
-    // console.log(request.headers)
-    const id = Number(request.params.id)
+app.get('/api/persons/:id', (req, res) => {
+    // console.log(req.headers)
+    const id = Number(req.params.id)
     const selected = persons.find(p => p.id === id)
     if (selected) {
-        response.json(selected)
+        res.json(selected)
     } else {
-        response.status(404).send(`404 ID ${id} Not Found`)
+        res.status(404).send(`404 ID ${id} Not Found`)
     }
 })
 
 
-app.post('/api/persons', (request, response) => {
-    console.log(request.headers)
-    const body = request.body
+app.post('/api/persons', (req, res) => {
+    // console.log(req.headers)
+    const body = req.body
+
+    morgan.token('requested', (req, res, param) => {
+        return JSON.stringify(req.body)
+    })
+
+    // this just cleans the other logs after a post
+    setTimeout(() => {
+        morgan.token('requested', (req, res, param) => {
+            return ''
+        })
+    })
 
     if (!body.name) {
-        return response.status(400).json({
+        return res.status(400).json({
             error: 'Missing Name'
         })
     }
     if (!body.number) {
-        return response.status(400).json({
+        return res.status(400).json({
             error: 'Missing Number'
         })
     }
     if (persons.find(p => p.name.toLowerCase() === body.name.toLowerCase())) {
-        return response.status(400).json({
+        return res.status(400).json({
             error: 'Name already exists'
         })
     }
@@ -89,15 +105,16 @@ app.post('/api/persons', (request, response) => {
     }
 
     persons = persons.concat(newEntry)
-    response.json(newEntry)
+    res.json(newEntry)
+    
 })
 
 
-app.delete('/api/persons/:id', (request, response) => {
-    // console.log(request.headers)
-    const id = Number(request.params.id)
+app.delete('/api/persons/:id', (req, res) => {
+    // console.log(req.headers)
+    const id = Number(req.params.id)
     persons = persons.filter(p => p.id !== id)
-    response.status(204).end()
+    res.status(204).end()
 })
 
 
