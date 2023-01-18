@@ -1,0 +1,60 @@
+### basic
+GET http://localhost:3001/
+
+### info
+GET http://localhost:3001/info
+
+###
+
+### all persons
+GET http://localhost:3001/api/persons
+
+### single person
+GET http://localhost:3001/api/persons/2
+
+### single person (not in list)
+GET http://localhost:3001/api/persons/1000
+
+###
+
+### remove person not in list
+DELETE http://localhost:3001/api/persons/1000
+
+### remove person in list
+DELETE http://localhost:3001/api/persons/2
+
+###
+
+### No Name
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "number": "1"
+}
+
+### No Number
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Jon"
+}
+
+### Duplicate Name
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Arto Hellas",
+    "number": "0"
+}
+
+### Works Fine
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Bloblo",
+    "number": "101010"
+}
