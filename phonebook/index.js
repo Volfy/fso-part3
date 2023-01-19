@@ -1,13 +1,22 @@
 //const {req, res} = require('express')
 const express = require('express')
-const morgan = require('morgan')
-const app = express()
 
+const cors = require('cors')
+const app = express()
+let morgan;
+
+app.use(cors())
 app.use(express.json())
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :requested'))
-morgan.token('requested', (reqS, resS, param) => {
-    return ''
-})
+app.use(express.static('build'))
+
+
+if (process.env.NODE_ENV !== 'production') {
+    morgan = require('morgan')
+    app.use(morgan(':method :url :status :res[content-length] - :response-time ms :requested'))
+    morgan.token('requested', (reqS, resS, param) => {
+        return ''
+    })
+}
 
 
 // Persons
@@ -70,17 +79,18 @@ app.get('/api/persons/:id', (req, res) => {
 app.post('/api/persons', (req, res) => {
     // console.log(req.headers)
     const body = req.body
-
-    morgan.token('requested', (req, res, param) => {
-        return JSON.stringify(req.body)
-    })
-
-    // this just cleans the other logs after a post
-    setTimeout(() => {
+    if (process.env.NODE_ENV !== 'production') {
         morgan.token('requested', (req, res, param) => {
-            return ''
+            return JSON.stringify(req.body)
         })
-    })
+
+        // this just cleans the other logs after a post
+        setTimeout(() => {
+            morgan.token('requested', (req, res, param) => {
+                return ''
+            })
+        })
+    }
 
     if (!body.name) {
         return res.status(400).json({
@@ -121,7 +131,7 @@ app.delete('/api/persons/:id', (req, res) => {
 
 // LISTEN
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })

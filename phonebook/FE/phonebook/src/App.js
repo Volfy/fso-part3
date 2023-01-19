@@ -54,11 +54,12 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
 
-    // some validation
+    // removed, interferes with BE
+    /* some validation
     if(!newName || !newNumber) {
       alert('Missing Values')
       return
-    }
+    } */
 
     // Duplicate Numbers should be fine.
     // will add duplicate names in case one browser adds
@@ -93,6 +94,13 @@ const App = () => {
       const id = oldPerson.id
       if (window.confirm(`${Person.name} is already in the phonebook. 
 Replace the old number with the new one?`)) {
+
+        setNotifMessage({
+          message: `Functionality Unavailable`,
+          isError: true
+        }) 
+        setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
+        /*
         phServ
           .update(id, Person)
           .then(data => {
@@ -114,7 +122,9 @@ Replace the old number with the new one?`)) {
             isError: true
           })
           setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
+          
           })
+          */
       }
     }
   }
