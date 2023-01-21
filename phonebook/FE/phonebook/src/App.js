@@ -11,11 +11,14 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [nameFilter, setNameFilter] = useState('')
   const [notifMessage, setNotifMessage] = useState({message: null, isError: false})
+  
   const handleChange = (event, setFn) => {
     setFn(event.target.value)
   }
+  
   const handleDelete = event => {
     const name = event.target.getAttribute('name')
+
     if(window.confirm(`Are you sure you want to delete ${name}?`)) {
       const id = event.target.getAttribute('id')
       phServ
@@ -54,80 +57,24 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
 
-    // removed, interferes with BE
-    /* some validation
-    if(!newName || !newNumber) {
-      alert('Missing Values')
-      return
-    } */
-
-    // Duplicate Numbers should be fine.
-    // will add duplicate names in case one browser adds
-    // a new name and the other also adds before the prior updates.
-    // the check if unique is ONLY in the frontend.
-    // running setPersons() in getAll() again doesn't change anything
-    const isUnique = !persons.filter(p => p.name.toLowerCase() === newName.toLowerCase()).length 
-
     const Person = {
       name: newName,
       number: newNumber,
     }
 
-    if (isUnique){
-
-      phServ
-        .addNew(Person)
-        .then(data => {
-          setPersons(persons.concat(data))
-          setNewName('')
-          setNewNumber('')
-          setNotifMessage({
-            message: `Added ${newName}`,
-            isError: false
-          })
-          setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
-        })  
-    } else {
-      const oldPerson = persons.filter(p => p.name.toLowerCase() === newName.toLowerCase())[0]
-      // using the old name means case changes won't update. 
-      Person.name = oldPerson.name
-      const id = oldPerson.id
-      if (window.confirm(`${Person.name} is already in the phonebook. 
-Replace the old number with the new one?`)) {
-
+    phServ
+      .addNew(Person)
+      .then(data => {
+        setPersons(persons.concat(data))
+        setNewName('')
+        setNewNumber('')
         setNotifMessage({
-          message: `Functionality Unavailable`,
-          isError: true
-        }) 
+          message: `Added ${newName}`,
+          isError: false
+        })
         setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
-        /*
-        phServ
-          .update(id, Person)
-          .then(data => {
-            setPersons(persons.map(p => p.id != id ? p : data))
-            setNewName('')
-            setNewNumber('')
-            setNotifMessage({
-              message: `Updated ${newName}`,
-              isError: false
-            })
-            setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
-          })
-          .catch(error => {
-            phServ
-            .getAll()
-            .then(data => setPersons(data))
-            setNotifMessage({
-            message: `${newName} cannot be updated, has been deleted from server`,
-            isError: true
-          })
-          setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
-          
-          })
-          */
-      }
+      })  
     }
-  }
 
   return (
     <div>

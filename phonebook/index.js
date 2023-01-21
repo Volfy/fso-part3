@@ -57,6 +57,8 @@ app.get('/api/persons/:id', (req, res) => {
 app.post('/api/persons', (req, res) => {
     // console.log(req.headers)
     const body = req.body
+
+    // LOGGING
     if (process.env.NODE_ENV !== 'production') {
         morgan.token('requested', (req, res, param) => {
             return JSON.stringify(req.body)
@@ -70,6 +72,7 @@ app.post('/api/persons', (req, res) => {
         })
     }
 
+    // VALIDATION
     if (!body.name) {
         return res.status(400).json({
             error: 'Missing Name'
@@ -80,20 +83,20 @@ app.post('/api/persons', (req, res) => {
             error: 'Missing Number'
         })
     }
-    if (persons.find(p => p.name.toLowerCase() === body.name.toLowerCase())) {
+    /* if (persons.find(p => p.name.toLowerCase() === body.name.toLowerCase())) {
         return res.status(400).json({
             error: 'Name already exists'
         })
-    }
+    } */
 
-    const newEntry = {
+    const newEntry = new Number({
         name: body.name,
         number: body.number,
-        id: Math.floor(Math.random() * 10000000000000000)
-    }
+    })
 
-    persons = persons.concat(newEntry)
-    res.json(newEntry)
+    newEntry.save().then(saved => {
+        res.json(saved)
+    })
     
 })
 
