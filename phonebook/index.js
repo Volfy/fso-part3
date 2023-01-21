@@ -1,15 +1,18 @@
-//const {req, res} = require('express')
-const express = require('express')
+require('dotenv').config()
 
+const Number = require('./models/number')
+const {req, res} = require('express')
+const express = require('express')
 const cors = require('cors')
 const app = express()
-let morgan;
 
 app.use(cors())
 app.use(express.json())
 app.use(express.static('build'))
 
+// Logging, prod
 
+let morgan;
 if (process.env.NODE_ENV !== 'production') {
     morgan = require('morgan')
     app.use(morgan(':method :url :status :res[content-length] - :response-time ms :requested'))
@@ -17,32 +20,6 @@ if (process.env.NODE_ENV !== 'production') {
         return ''
     })
 }
-
-
-// Persons
-
-let persons = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
 
 // RESTful/CRUD
 
@@ -55,26 +32,27 @@ app.get('/', (req, res) => {
 
 app.get('/info', (req, res) => {
     // console.log(req.headers)
-    res.send(`Phonebook has info on ${persons.length} people. <br>${new Date()}`)
-})
-
+    Number.find({})
+        .then(numbers => {
+            res.send(`Phonebook has info on ${numbers.length} people. <br>${new Date()}`)
+        })
+}) 
 
 app.get('/api/persons', (req, res) => {
     // console.log(req.headers)
-    res.json(persons)
+    Number.find({})
+        .then(numbers => {
+            res.json(numbers)
+        })
 })
 
 app.get('/api/persons/:id', (req, res) => {
-    // console.log(req.headers)
-    const id = Number(req.params.id)
-    const selected = persons.find(p => p.id === id)
-    if (selected) {
-        res.json(selected)
-    } else {
-        res.status(404).send(`404 ID ${id} Not Found`)
-    }
+    Number.findById(req.params.id).then(number => {
+        res.json(number)
+    })
 })
 
+// to do: port to mongoose
 
 app.post('/api/persons', (req, res) => {
     // console.log(req.headers)
@@ -131,7 +109,7 @@ app.delete('/api/persons/:id', (req, res) => {
 
 // LISTEN
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
