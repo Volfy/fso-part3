@@ -62,7 +62,23 @@ const App = () => {
       number: newNumber,
     }
 
-    phServ
+    if(persons.find(p => p.name.toLowerCase() === newName.toLowerCase())) {
+      const id = persons.filter(p => p.name.toLowerCase() === newName.toLowerCase())[0].id
+      phServ
+      .update(id, Person)
+      .then(data => {
+        setPersons(persons.map(p => p.id !== id ? p : data))
+        setNewName('')
+        setNewNumber('')
+        setNotifMessage({
+          message: `Updated ${newName}`,
+          isError: false
+        })
+        setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
+      })
+    }
+    else {
+      phServ
       .addNew(Person)
       .then(data => {
         setPersons(persons.concat(data))
@@ -73,7 +89,10 @@ const App = () => {
           isError: false
         })
         setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
-      })  
+      })
+    }
+
+      
     }
 
   return (
