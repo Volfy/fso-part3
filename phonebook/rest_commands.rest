@@ -58,3 +58,21 @@ content-type: application/json
     "name": "Bloblo",
     "number": "101010"
 }
+
+###
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Arto Hellas",
+    "number": "00-000000"
+}
+
+###
+POST https://old-thunder-9784.fly.dev/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Arto Hellas",
+    "number": "00-000000"
+}

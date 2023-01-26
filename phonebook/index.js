@@ -53,34 +53,8 @@ app.get('/api/persons/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
-
-    {// LOGGING
-    /* if (process.env.NODE_ENV !== 'production') {
-        morgan.token('requested', (req, res, param) => {
-            return JSON.stringify(req.body)
-        })
-
-        // this just cleans the other logs after a post
-        setTimeout(() => {
-            morgan.token('requested', (req, res, param) => {
-                return ''
-            })
-        })
-    } */}
-
-    // VALIDATION
-    if (!body.name) {
-        return res.status(400).json({
-            error: 'Missing Name'
-        })
-    }
-    if (!body.number) {
-        return res.status(400).json({
-            error: 'Missing Number'
-        })
-    }
 
     // SAVING
 
@@ -89,9 +63,17 @@ app.post('/api/persons', (req, res) => {
         number: body.number,
     })
 
-    newEntry.save().then(saved => {
-        res.json(saved)
-    })
+    Number.find({name : newEntry.name})
+        .then(n => {
+            if (n.length) {
+                res.status(400).send({error: 'Name already in phonebook'})
+            } else {
+                newEntry.save().then(saved => {
+                    res.json(saved)
+                })
+                .catch(error => next(error))
+            }
+        })
     
 })
 
@@ -103,7 +85,7 @@ app.put('/api/persons/:id', (req, res, next) => {
         number: body.number
     }
 
-    Number.findByIdAndUpdate(req.params.id, updatedEntry, {new: true} )
+    Number.findByIdAndUpdate(req.params.id, updatedEntry, {new: true, runValidators: true, context: 'query'} )
         .then(updated => {
             res.json(updated)
         })
@@ -134,6 +116,8 @@ const errorHandler = (error, req, res, next) => {
     
     if (error.name === 'CastError') {
         return res.status(400).send({error: 'malformatted id'})
+    } else if (error.name === 'ValidationError') {
+        return res.status(400).json(error.message)
     }
 
     next(error)

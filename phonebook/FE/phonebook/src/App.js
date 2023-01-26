@@ -76,6 +76,13 @@ const App = () => {
         })
         setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
       })
+      .catch(error => {
+        setNotifMessage({
+          message: error.response.data,
+          isError: true
+        })
+        setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
+      })
     }
     else {
       phServ
@@ -87,6 +94,13 @@ const App = () => {
         setNotifMessage({
           message: `Added ${newName}`,
           isError: false
+        })
+        setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
+      })
+      .catch(error => {
+        setNotifMessage({
+          message: error.response.data,
+          isError: true
         })
         setTimeout(() => setNotifMessage({message: null, isError: false}), 4000)
       })
