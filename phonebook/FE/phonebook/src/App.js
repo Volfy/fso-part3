@@ -24,7 +24,7 @@ const App = () => {
       phServ
         .remove(id)
         .then(r => {
-          setPersons(persons.filter(p => p.id != id))
+          setPersons(persons.filter(p => p.id !== id))
           setNewName('')
           setNewNumber('')
           setNotifMessage({

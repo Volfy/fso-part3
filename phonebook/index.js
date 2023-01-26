@@ -1,6 +1,5 @@
 require('dotenv').config()
 
-const { response } = require('express')
 const express = require('express')
 const cors = require('cors')
 const NumEntry = require('./models/number')
@@ -87,8 +86,8 @@ app.delete('/api/persons/:id', (req, res, next) => {
 // unknown endpoints
 
 // eslint-disable-next-line no-unused-vars
-const unknownEndpoint = (_req, _res) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+const unknownEndpoint = (_req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
